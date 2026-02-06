@@ -321,7 +321,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000/api/status';
+        const API_URL = 'https://anitasiqr.com/rezervuar/api/status';
         let errorCount = 0;
 
         function formatValue(value) {
@@ -399,7 +399,7 @@
                 buttonStatus.textContent = '🛑 İşlem yapılıyor...';
                 buttonStatus.style.color = '#f59e0b';
 
-                const response = await fetch('http://localhost:3000/api/modbus/valve-control', {
+                const response = await fetch('https://anitasiqr.com/rezervuar/api/modbus/valve-control', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -441,7 +441,7 @@
                 buttonStatus.textContent = '🔄 İşlem yapılıyor...';
                 buttonStatus.style.color = '#f59e0b';
 
-                const response = await fetch('http://localhost:3000/api/modbus/valve-control', {
+                const response = await fetch('https://anitasiqr.com/rezervuar/api/modbus/valve-control', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
