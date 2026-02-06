@@ -23,7 +23,7 @@ import { ModbusData } from './entities/modbus-data.entity';
       password: process.env.DB_PASSWORD || '1234',
       database: process.env.DB_DATABASE || 'hurjet_rezervuar',
       entities: [ModbusData],
-      synchronize: false, // Geliştirme için true, production'da false yapın
+      synchronize: true, // Geliştirme için true, production'da false yapın
       logging: false,
     }),
     ServeStaticModule.forRoot({
