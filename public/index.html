@@ -227,6 +227,39 @@
         .color-yellow { color: #f59e0b; }
         .color-purple { color: #8b5cf6; }
         .color-indigo { color: #6366f1; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .finish-button, .reset-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+                letter-spacing: 1px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-value {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .finish-button, .reset-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                letter-spacing: 0.5px;
+            }
+
+            div[style*="display: flex; gap: 20px"] {
+                flex-direction: column;
+                gap: 10px !important;
+            }
+        }
     </style>
 </head>
 <body>
