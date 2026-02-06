@@ -10,7 +10,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = process.env.PORT ?? 3000;
+  const port = process.env.PORT ?? 3001;
   await app.listen(port);
   console.log(`NestJS backend çalışıyor: http://localhost:${port}`);
   console.log(`Web Arayüz: http://localhost:${port}/`);

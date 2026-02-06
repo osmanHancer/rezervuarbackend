@@ -20,10 +20,10 @@ import { ModbusData } from './entities/modbus-data.entity';
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '3306', 10),
       username: process.env.DB_USERNAME || 'root',
-      password: process.env.DB_PASSWORD || '',
+      password: process.env.DB_PASSWORD || '1234',
       database: process.env.DB_DATABASE || 'hurjet_rezervuar',
       entities: [ModbusData],
-      synchronize: true, // Geliştirme için true, production'da false yapın
+      synchronize: false, // Geliştirme için true, production'da false yapın
       logging: false,
     }),
     ServeStaticModule.forRoot({
