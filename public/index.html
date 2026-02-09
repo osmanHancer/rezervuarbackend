@@ -395,11 +395,11 @@
                     document.getElementById('dataAge').textContent = result.dataAge + ' saniye önce';
 
                     // Update sensor values
-                    document.getElementById('rezervuar').textContent = formatValue(result.data.rezervuarLitre);
+                    document.getElementById('rezervuar').textContent = formatValue(result.data.rezervuarLitre / 100);
                     document.getElementById('highPressure').textContent = formatValue(result.data.highPressure);
-                    document.getElementById('lowPressure').textContent = formatValue(result.data.lowPressure);
-                    document.getElementById('ambientTemp').textContent = formatValue(result.data.ambientTemperature);
-                    document.getElementById('hydraulicTemp').textContent = formatValue(result.data.hydraulicTemperature);
+                    document.getElementById('lowPressure').textContent = formatValue(result.data.lowPressure / 10);
+                    document.getElementById('ambientTemp').textContent = formatValue(result.data.ambientTemperature / 10);
+                    document.getElementById('hydraulicTemp').textContent = formatValue(result.data.hydraulicTemperature / 10);
                     document.getElementById('valvePos').textContent = formatValue(result.data.valvePosition);
                 }
             } catch (error) {
