@@ -12,15 +12,9 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // Ana rezervuar sayfası
-  @Get()
-  getIndex(@Res() res: Response) {
+  // Online sayfası
+  @Get('online')
+  getOnline(@Res() res: Response) {
     res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  }
-
-  // Monitoring sayfası
-  @Get('monitoring')
-  getMonitoring(@Res() res: Response) {
-    res.sendFile(join(__dirname, '..', 'public', 'monitoring.html'));
   }
 }

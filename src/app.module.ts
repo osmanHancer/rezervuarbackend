@@ -29,7 +29,10 @@ import { ModbusData } from './entities/modbus-data.entity';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
-      exclude: ['/api*', '/monitoring'], // API ve monitoring route'larını hariç tut
+      exclude: ['/api*', '/online'], // API ve online route'larını hariç tut
+      serveStaticOptions: {
+        index: false, // Ana dizinde index.html gösterme
+      },
     }),
     ModbusModule,
     StatusModule,

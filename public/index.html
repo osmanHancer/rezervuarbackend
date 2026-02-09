@@ -291,10 +291,7 @@
                     <span class="info-label">Son Güncelleme:</span>
                     <span class="info-value" id="lastUpdate">-</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Veri Yaşı:</span>
-                    <span class="info-value" id="dataAge">-</span>
-                </div>
+          
             </div>
 
             <div class="grid">
@@ -392,7 +389,6 @@
                     document.getElementById('port').textContent = result.data.port || '-';
                     document.getElementById('cycle').textContent = (result.data.cycle || 0) + 750 || '-';
                     document.getElementById('lastUpdate').textContent = formatDate(result.lastUpdate);
-                    document.getElementById('dataAge').textContent = result.dataAge + ' saniye önce';
 
                     // Update sensor values
                     document.getElementById('rezervuar').textContent = formatValue(result.data.rezervuarLitre / 100);
