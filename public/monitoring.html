@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hurjet Rezervuar - Monitoring</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-offline {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status-no-data {
+            background: #f59e0b;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .card-unit {
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 50px;
+        }
+
+        .error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .last-update {
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+
+        .color-green { color: #10b981; }
+        .color-blue { color: #3b82f6; }
+        .color-red { color: #ef4444; }
+        .color-yellow { color: #f59e0b; }
+        .color-purple { color: #8b5cf6; }
+        .color-indigo { color: #6366f1; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Hurjet Rezervuar Monitoring</h1>
+            <p>Detaylı İzleme ve Analiz Paneli</p>
+            <div id="status-badge" class="status-badge status-no-data">Yükleniyor...</div>
+        </div>
+
+        <div id="loading" class="loading">
+            Veriler yükleniyor...
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            ⚠️ Backend'e bağlanılamadı. Lütfen NestJS sunucusunun çalıştığından emin olun.
+        </div>
+
+        <div id="data-container" style="display: none;">
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">Port:</span>
+                    <span class="info-value" id="port">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Cycle:</span>
+                    <span class="info-value" id="cycle">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Son Güncelleme:</span>
+                    <span class="info-value" id="lastUpdate">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Veri Yaşı:</span>
+                    <span class="info-value" id="dataAge">-</span>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">💧 Rezervuar</div>
+                    <div class="card-value color-blue" id="rezervuar">-</div>
+                    <div class="card-unit">Litre</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">⬆️ Yüksek Basınç</div>
+                    <div class="card-value color-red" id="highPressure">-</div>
+                    <div class="card-unit">Bar</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">⬇️ Düşük Basınç</div>
+                    <div class="card-value color-green" id="lowPressure">-</div>
+                    <div class="card-unit">Bar</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🌡️ Ortam Sıcaklığı</div>
+                    <div class="card-value color-yellow" id="ambientTemp">-</div>
+                    <div class="card-unit">°C</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🔥 Hidrolik Sıcaklık</div>
+                    <div class="card-value color-purple" id="hydraulicTemp">-</div>
+                    <div class="card-unit">°C</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎚️ Valf Pozisyonu</div>
+                    <div class="card-value color-indigo" id="valvePos">-</div>
+                    <div class="card-unit">%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="last-update">
+            Otomatik güncelleme: Her 2 saniyede bir
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://anitasiqr.com/rezervuar/api/status';
+        let errorCount = 0;
+
+        function formatValue(value) {
+            if (value === null || value === undefined) return '-';
+            return typeof value === 'number' ? value.toFixed(2) : value;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('tr-TR');
+        }
+
+        async function fetchStatus() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network error');
+                
+                const result = await response.json();
+                errorCount = 0;
+                
+                // Hide loading/error, show data
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('data-container').style.display = 'block';
+
+                // Update status badge
+                const badge = document.getElementById('status-badge');
+                badge.className = 'status-badge status-' + result.status;
+                badge.textContent = result.status === 'online' ? 'Çevrimiçi' : 
+                                   result.status === 'offline' ? 'Çevrimdışı' : 'Veri Yok';
+
+                if (result.data) {
+                    // Update info card
+                    document.getElementById('port').textContent = result.data.port || '-';
+                    document.getElementById('cycle').textContent = result.data.cycle || '-';
+                    document.getElementById('lastUpdate').textContent = formatDate(result.lastUpdate);
+                    document.getElementById('dataAge').textContent = result.dataAge + ' saniye önce';
+
+                    // Update sensor values
+                    document.getElementById('rezervuar').textContent = formatValue(result.data.rezervuarLitre);
+                    document.getElementById('highPressure').textContent = formatValue(result.data.highPressure);
+                    document.getElementById('lowPressure').textContent = formatValue(result.data.lowPressure);
+                    document.getElementById('ambientTemp').textContent = formatValue(result.data.ambientTemperature);
+                    document.getElementById('hydraulicTemp').textContent = formatValue(result.data.hydraulicTemperature);
+                    document.getElementById('valvePos').textContent = formatValue(result.data.valvePosition);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                errorCount++;
+                
+                if (errorCount > 2) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('data-container').style.display = 'none';
+                }
+            }
+        }
+
+        // Initial fetch
+        fetchStatus();
+
+        // Auto-refresh every 2 seconds
+        setInterval(fetchStatus, 2000);
+    </script>
+</body>
+</html>
+
