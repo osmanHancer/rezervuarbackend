@@ -3,7 +3,7 @@ import { ModbusService } from './modbus.service';
 import { ValveStateService } from './valve-state.service';
 import { CreateModbusDataDto } from './dto/create-modbus-data.dto';
 
-@Controller('api/modbus')
+@Controller('rezervuar/api/modbus')
 export class ModbusController {
   constructor(
     private readonly modbusService: ModbusService,
