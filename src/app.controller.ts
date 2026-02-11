@@ -3,7 +3,7 @@ import type { Response } from 'express';
 import { join } from 'path';
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('rezervuar')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
