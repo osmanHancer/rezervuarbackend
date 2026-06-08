@@ -6,6 +6,5 @@ export class CreateModbusDataDto {
   lowPressure?: number;
   ambientTemperature?: number;
   hydraulicTemperature?: number;
-  valvePosition?: number;
 }
 

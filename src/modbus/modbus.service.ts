@@ -1,46 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ModbusData } from '../entities/modbus-data.entity';
 import { CreateModbusDataDto } from './dto/create-modbus-data.dto';
-import { ValveStateService } from './valve-state.service';
 
-@Injectable()
 export class ModbusService {
   constructor(
-    @InjectRepository(ModbusData)
-    private modbusDataRepository: Repository<ModbusData>,
-    private valveStateService: ValveStateService,
+    private readonly modbusDataRepository: Repository<ModbusData>,
   ) {}
 
   async create(createModbusDataDto: CreateModbusDataDto): Promise<ModbusData> {
-    // Valve position sadece backend'de yönetiliyor
-    const valveState = this.valveStateService.getValvePosition();
-    const dataWithValve = {
-      ...createModbusDataDto,
-      // Valve state kullan (başlangıçta 1, buton basılınca 0)
-      valvePosition: valveState.position,
-    };
-
     const totalCount = await this.modbusDataRepository.count();
     
     if (totalCount >= 100) {
-      // 100 kayıt doluysa, en eski kaydı güncelle (Circular Buffer)
       const [oldestRecord] = await this.modbusDataRepository.find({
         order: { timestamp: 'ASC' },
         take: 1,
       });
       
       if (oldestRecord) {
-        // En eski kaydı yeni veriyle güncelle
-        Object.assign(oldestRecord, dataWithValve);
-        oldestRecord.timestamp = new Date(); // Zaman damgasını güncelle
+        Object.assign(oldestRecord, createModbusDataDto);
+        oldestRecord.timestamp = new Date();
         return await this.modbusDataRepository.save(oldestRecord);
       }
     }
     
-    // İlk 100 kayıt için normal INSERT
-    const modbusData = this.modbusDataRepository.create(dataWithValve);
+    const modbusData = this.modbusDataRepository.create(createModbusDataDto);
     return await this.modbusDataRepository.save(modbusData);
   }
 
@@ -103,10 +86,8 @@ export class ModbusService {
       lowPressure: calculateStats('lowPressure'),
       ambientTemperature: calculateStats('ambientTemperature'),
       hydraulicTemperature: calculateStats('hydraulicTemperature'),
-      valvePosition: calculateStats('valvePosition'),
       firstTimestamp: data[data.length - 1]?.timestamp,
       lastTimestamp: data[0]?.timestamp,
     };
   }
 }
-

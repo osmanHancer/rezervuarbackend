@@ -1,16 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Channel } from '../common/channels';
 import { ModbusData } from '../entities/modbus-data.entity';
 
-@Injectable()
 export class StatusService {
-  constructor(
-    @InjectRepository(ModbusData)
-    private modbusDataRepository: Repository<ModbusData>,
-  ) {}
+  constructor(private readonly modbusDataRepository: Repository<ModbusData>) {}
 
-  async getLatestData() {
+  async getLatestData(channel: Channel) {
     const [latestRecord] = await this.modbusDataRepository.find({
       order: { timestamp: 'DESC' },
       take: 1,
@@ -18,6 +13,7 @@ export class StatusService {
 
     if (!latestRecord) {
       return {
+        channel,
         status: 'no_data',
         message: 'Henüz veri yok',
         data: null,
@@ -31,6 +27,7 @@ export class StatusService {
     );
 
     return {
+      channel,
       status: dataAge < 30 ? 'online' : 'offline',
       dataAge: dataAge,
       lastUpdate: latestRecord.timestamp,
@@ -42,7 +39,6 @@ export class StatusService {
         lowPressure: latestRecord.lowPressure,
         ambientTemperature: latestRecord.ambientTemperature,
         hydraulicTemperature: latestRecord.hydraulicTemperature,
-        valvePosition: latestRecord.valvePosition,
       },
     };
   }

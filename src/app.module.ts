@@ -1,41 +1,40 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ModbusModule } from './modbus/modbus.module';
-import { StatusModule } from './status/status.module';
-import { ModbusData } from './entities/modbus-data.entity';
+import { CHANNELS } from './common/channels';
+import { getDatabaseConfig } from './database/database.config';
+import { ModbusChannelModule } from './modbus/modbus-channel.module';
+import { StatusChannelModule } from './status/status-channel.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: [resolve(process.cwd(), '.env')],
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '3306', 10),
-      username: process.env.DB_USERNAME || 'root',
-      password: process.env.DB_PASSWORD || '1234',
-      database: process.env.DB_DATABASE || 'hurjet_rezervuar',
-      entities: [ModbusData],
-      synchronize: true, // Geliştirme için true, production'da false yapın
-      logging: false,
-    }),
+    ...CHANNELS.map((channel) =>
+      TypeOrmModule.forRootAsync({
+        name: channel,
+        imports: [ConfigModule],
+        useFactory: (config: ConfigService) =>
+          getDatabaseConfig(channel, config),
+        inject: [ConfigService],
+      }),
+    ),
+    ...CHANNELS.map((channel) => ModbusChannelModule.forChannel(channel)),
+    ...CHANNELS.map((channel) => StatusChannelModule.forChannel(channel)),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/',
-      exclude: ['/api*', '/online'], // API ve online route'larını hariç tut
+      exclude: ['/api*', '/online'],
       serveStaticOptions: {
-        index: false, // Ana dizinde index.html gösterme
+        index: false,
       },
     }),
-    ModbusModule,
-    StatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

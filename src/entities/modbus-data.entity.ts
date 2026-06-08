@@ -26,9 +26,6 @@ export class ModbusData {
   @Column({ type: 'float', nullable: true })
   hydraulicTemperature: number;
 
-  @Column({ type: 'float', nullable: true, default: 1 })
-  valvePosition: number;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   timestamp: Date;
 }

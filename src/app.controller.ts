@@ -12,9 +12,15 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // Online sayfası
+  // Online sayfası (tek kanal — varsayılan A)
   @Get('online')
   getOnline(@Res() res: Response) {
     res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  }
+
+  // 4 kanallı monitoring paneli
+  @Get('monitoring')
+  getMonitoring(@Res() res: Response) {
+    res.sendFile(join(__dirname, '..', 'public', 'monitoring.html'));
   }
 }

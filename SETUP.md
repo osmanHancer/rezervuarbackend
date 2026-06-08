@@ -36,7 +36,10 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=your_password
-DB_DATABASE=hurjet_rezervuar
+DB_DATABASE_A=hurjet_rezervuar_a
+DB_DATABASE_B=hurjet_rezervuar_b
+DB_DATABASE_C=hurjet_rezervuar_c
+DB_DATABASE_D=hurjet_rezervuar_d
 PORT=3000
 ```
 
@@ -61,15 +64,30 @@ npm run start:prod
 
 ### 5. Veritabanı Tabloları
 
-TypeORM `synchronize: true` ile çalıştığı için tablolar otomatik oluşturulacaktır. İlk başlatmada `modbus_data` tablosu otomatik olarak oluşturulur.
+MySQL'de 4 veritabanı oluşturun:
+
+```sql
+CREATE DATABASE hurjet_rezervuar_a CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE hurjet_rezervuar_b CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE hurjet_rezervuar_c CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE hurjet_rezervuar_d CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+TypeORM `synchronize: true` ile çalıştığı için her veritabanında `modbus_data` tablosu otomatik oluşturulur.
 
 **UYARI**: Production ortamında `synchronize: false` yapıp migration kullanın!
 
 ## API Endpoints
 
 ### Veri Gönderme (Electron uygulaması kullanır)
+
+4 ayrı kanal vardır: **a**, **b**, **c**, **d**. Her kanal kendi MySQL veritabanına yazar.
+
 ```
-POST http://localhost:3000/modbus/data
+POST http://localhost:3001/api/a/modbus/data
+POST http://localhost:3001/api/b/modbus/data
+POST http://localhost:3001/api/c/modbus/data
+POST http://localhost:3001/api/d/modbus/data
 Content-Type: application/json
 
 {
@@ -79,34 +97,44 @@ Content-Type: application/json
   "highPressure": 250.3,
   "lowPressure": 50.2,
   "ambientTemperature": 25.5,
-  "hydraulicTemperature": 45.3,
-  "valvePosition": 75.0
+  "hydraulicTemperature": 45.3
 }
 ```
 
 ### Tüm Verileri Getir (son 100 kayıt)
 ```
-GET http://localhost:3000/modbus/data
+GET http://localhost:3001/api/a/modbus/data
+GET http://localhost:3001/api/b/modbus/data
+GET http://localhost:3001/api/c/modbus/data
+GET http://localhost:3001/api/d/modbus/data
 ```
 
 ### Port'a Göre Veri Getir
 ```
-GET http://localhost:3000/modbus/data/port/COM3
+GET http://localhost:3001/api/a/modbus/data/port/COM3
 ```
 
 ### Cycle'a Göre Veri Getir
 ```
-GET http://localhost:3000/modbus/data/cycle/1
+GET http://localhost:3001/api/a/modbus/data/cycle/1
 ```
 
 ### Cycle'ın Son Verisini Getir
 ```
-GET http://localhost:3000/modbus/data/cycle/1/latest
+GET http://localhost:3001/api/a/modbus/data/cycle/1/latest
 ```
 
 ### Cycle İstatistikleri
 ```
-GET http://localhost:3000/modbus/data/cycle/1/stats
+GET http://localhost:3001/api/a/modbus/data/cycle/1/stats
+```
+
+### Durum (Status)
+```
+GET http://localhost:3001/api/a/status
+GET http://localhost:3001/api/b/status
+GET http://localhost:3001/api/c/status
+GET http://localhost:3001/api/d/status
 ```
 
 ## Veritabanı Şeması
@@ -121,7 +149,6 @@ CREATE TABLE `modbus_data` (
   `lowPressure` float DEFAULT NULL,
   `ambientTemperature` float DEFAULT NULL,
   `hydraulicTemperature` float DEFAULT NULL,
-  `valvePosition` float DEFAULT NULL,
   `timestamp` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`),
   KEY `idx_port` (`port`),
