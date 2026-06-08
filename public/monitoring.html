@@ -174,7 +174,9 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin;
+        // /rezervuar/monitoring gibi alt path'te çalışırken API base'i doğru hesapla
+        const API_BASE = window.location.origin +
+            window.location.pathname.replace(/\/?monitoring\/?$/, '').replace(/\/$/, '');
         const CHANNELS = [
             { id: 'a', label: 'Kanal A', db: 'hurjet_rezervuar_a' },
             { id: 'b', label: 'Kanal B', db: 'hurjet_rezervuar_b' },
