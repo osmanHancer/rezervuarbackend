@@ -228,17 +228,17 @@
                             <div class="sensor-card">
                                 <div class="sensor-title">Rezervuar</div>
                                 <div class="sensor-value" id="rezervuar-${ch}">-</div>
-                                <div class="sensor-unit">Litre</div>
+                                <div class="sensor-unit">VDC</div>
                             </div>
                             <div class="sensor-card">
                                 <div class="sensor-title">Yüksek basınç</div>
                                 <div class="sensor-value" id="highPressure-${ch}">-</div>
-                                <div class="sensor-unit">Bar</div>
+                                <div class="sensor-unit">Psi</div>
                             </div>
                             <div class="sensor-card">
                                 <div class="sensor-title">Düşük basınç</div>
                                 <div class="sensor-value" id="lowPressure-${ch}">-</div>
-                                <div class="sensor-unit">Bar</div>
+                                <div class="sensor-unit">Psi</div>
                             </div>
                             <div class="sensor-card">
                                 <div class="sensor-title">Ortam sıcaklığı</div>
@@ -280,7 +280,7 @@
                     document.getElementById(`cycle-${ch}`).textContent = result.data.cycle ?? '-';
                     document.getElementById(`lastUpdate-${ch}`).textContent = formatDate(result.lastUpdate);
                     document.getElementById(`rezervuar-${ch}`).textContent =
-                        formatValue(result.data.rezervuarLitre != null ? result.data.rezervuarLitre / 100 : null);
+                        formatValue(result.data.rezervuarVDC != null ? result.data.rezervuarVDC / 100 : null);
                     document.getElementById(`highPressure-${ch}`).textContent =
                         formatValue(result.data.highPressure);
                     document.getElementById(`lowPressure-${ch}`).textContent =
